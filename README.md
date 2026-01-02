@@ -59,6 +59,7 @@ Anemone Backend — backend-платформа, развиваемая в сто
 
 ## Структура проекта
 
+```text
 anemone-backend-microservices/
 ├── internal/
 │   ├── auth/        # Аутентификация и JWT
@@ -74,6 +75,7 @@ anemone-backend-microservices/
 ├── go.mod
 ├── go.sum
 └── README.md
+```
 
 ---
 
