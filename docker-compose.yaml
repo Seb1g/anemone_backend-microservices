@@ -1,0 +1,149 @@
+services:
+  # --- DATABASES (порты закрыты для внешней среды) ---
+  db-auth:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: auth_db
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+    networks:
+      - micro-network
+
+  db-kanban:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: kanban_db
+    volumes:
+      - kanban_data:/var/lib/postgresql/data
+    networks:
+      - micro-network
+
+  db-mail:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mail_db
+    volumes:
+      - mail_data:/var/lib/postgresql/data
+    networks:
+      - micro-network
+
+  db-note:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: note_db
+    volumes:
+      - note_data:/var/lib/postgresql/data
+    networks:
+      - micro-network
+
+  db-catechize:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: catechize_db
+    volumes:
+      - catechize_data:/var/lib/postgresql/data
+    networks:
+      - micro-network
+
+  # --- MICROSERVICES ---
+  auth-service:
+    build:
+      context: .
+      args:
+        SERVICE_NAME: auth
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: postgres://user:password@db-auth:5432/auth_db?sslmode=disable
+    depends_on:
+      - db-auth
+    networks:
+      - micro-network
+    env_file:
+      - internal/auth/.env
+
+  kanban-service:
+    build:
+      context: .
+      args:
+        SERVICE_NAME: kanban
+    ports:
+      - "8081:8081"
+    environment:
+      DB_URL: postgres://user:password@db-kanban:5432/kanban_db?sslmode=disable
+    depends_on:
+      - db-kanban
+    networks:
+      - micro-network
+    env_file:
+      - internal/kanban/.env
+
+  mail-service:
+    build:
+      context: .
+      args:
+        SERVICE_NAME: mail
+    ports:
+      - "8082:8082"
+      - "25:25"
+    environment:
+      DB_URL: postgres://user:password@db-mail:5432/mail_db?sslmode=disable
+    depends_on:
+      - db-mail
+    networks:
+      - micro-network
+    env_file:
+      - internal/mail/.env
+
+  note-service:
+    build:
+      context: .
+      args:
+        SERVICE_NAME: notes # Проверьте папку в internal, на скрине было 'notes'
+    ports:
+      - "8083:8083"
+    environment:
+      DB_URL: postgres://user:password@db-note:5432/note_db?sslmode=disable
+    depends_on:
+      - db-note
+    networks:
+      - micro-network
+    env_file:
+      - internal/notes/.env
+
+  catechize-service:
+    build:
+      context: .
+      args:
+        SERVICE_NAME: catechize
+    ports:
+      - "8084:8084"
+    environment:
+      DB_URL: postgres://user:password@db-catechize:5432/catechize_db?sslmode=disable
+    depends_on:
+      - db-catechize
+    networks:
+      - micro-network
+    env_file:
+      - internal/catechize/.env
+
+networks:
+  micro-network:
+    driver: bridge
+
+volumes:
+  auth_data:
+  kanban_data:
+  mail_data:
+  note_data:
+  catechize_data:
