@@ -43,8 +43,8 @@ jobs:
           script: |
             cd /home/project/backend
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            docker-compose -f docker-compose.prod.yml pull
-            docker-compose -f docker-compose.prod.yml up -d --remove-orphans
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
       - name: Send Telegram Notification
         uses: appleboy/telegram-action@master
         if: always()
