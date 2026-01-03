@@ -45,3 +45,17 @@ jobs:
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             docker-compose -f docker-compose.prod.yml pull
             docker-compose -f docker-compose.prod.yml up -d --remove-orphans
+      - name: Send Telegram Notification
+        uses: appleboy/telegram-action@master
+        if: always()
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ${{ github.workflow }} report:
+            
+            Status: ${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}
+            Commit: ${{ github.event.head_commit.message }}
+            Author: ${{ github.actor }}
+            
+            Link: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
