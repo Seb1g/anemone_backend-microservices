@@ -1,6 +1,6 @@
 CREATE TABLE temp_addresses (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
+    user_id INTEGER,
     address VARCHAR(255) UNIQUE NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     expires_at TIMESTAMPTZ

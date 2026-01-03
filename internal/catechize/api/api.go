@@ -25,8 +25,8 @@ func (h *Handler) Routes(r *mux.Router, JWTsecret string) {
 	api := r.PathPrefix("/api/v1/quiz").Subrouter()
 	api.Use(AuthMiddleware(JWTsecret))
 
-	api.HandleFunc("/", h.addResult).Methods("POST")
-	api.HandleFunc("/", h.getResults).Methods("GET")
+	api.HandleFunc("/add", h.addResult).Methods("POST")
+	api.HandleFunc("/get_all", h.getResults).Methods("GET")
 	api.HandleFunc("/clear", h.clearResults).Methods("DELETE")
 }
 

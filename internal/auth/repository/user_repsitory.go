@@ -21,8 +21,8 @@ func NewUserRepo(db *sqlx.DB) *UserRepo {
 
 func (r *UserRepo) Create(ctx context.Context, u *model.User) error {
 	const q = `
-		INSERT INTO users (email, password)
-		VALUES ($1, $2)
+		INSERT INTO users (email, password, is_verify)
+		VALUES ($1, $2, false)
 		RETURNING id, created_at
 	`
 	return r.DB.QueryRowContext(ctx, q, u.Email, u.Password).

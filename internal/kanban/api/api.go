@@ -36,8 +36,8 @@ type Handler struct {
 	BoardRepo BoardRepoInterface
 }
 
-func NewHandler(s *services.Service) *Handler {
-	return &Handler{Service: s}
+func NewHandler(s *services.Service, r BoardRepoInterface) *Handler {
+	return &Handler{Service: s, BoardRepo: r}
 }
 
 func (h *Handler) Routes(r *mux.Router, JWTsecret string) {
@@ -49,6 +49,7 @@ func (h *Handler) Routes(r *mux.Router, JWTsecret string) {
 	// --- BOARDS ---
 	api.HandleFunc("/create_board", h.createBoard).Methods("POST")
 	api.HandleFunc("/get_all_user_boards", h.getAllUserBoards).Methods("GET")
+	
 	boardRouter := api.PathPrefix("/board/{boardID}").Subrouter()
 	boardRouter.Use(func(next http.Handler) http.Handler {
 		return IsBoardOwner_Path(boardRepo, next)

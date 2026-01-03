@@ -8,6 +8,11 @@ services:
       POSTGRES_DB: auth_db
     volumes:
       - auth_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d auth_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - micro-network
 
@@ -19,6 +24,11 @@ services:
       POSTGRES_DB: kanban_db
     volumes:
       - kanban_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d kanban_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - micro-network
 
@@ -30,6 +40,11 @@ services:
       POSTGRES_DB: mail_db
     volumes:
       - mail_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d mail_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - micro-network
 
@@ -41,6 +56,11 @@ services:
       POSTGRES_DB: note_db
     volumes:
       - note_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d note_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - micro-network
 
@@ -52,6 +72,11 @@ services:
       POSTGRES_DB: catechize_db
     volumes:
       - catechize_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d catechize_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - micro-network
 
@@ -66,7 +91,8 @@ services:
     environment:
       DB_URL: postgres://user:password@db-auth:5432/auth_db?sslmode=disable
     depends_on:
-      - db-auth
+      db-auth:
+        condition: service_healthy
     networks:
       - micro-network
     env_file:
@@ -82,7 +108,8 @@ services:
     environment:
       DB_URL: postgres://user:password@db-kanban:5432/kanban_db?sslmode=disable
     depends_on:
-      - db-kanban
+      db-kanban:
+        condition: service_healthy
     networks:
       - micro-network
     env_file:
@@ -99,7 +126,8 @@ services:
     environment:
       DB_URL: postgres://user:password@db-mail:5432/mail_db?sslmode=disable
     depends_on:
-      - db-mail
+      db-mail:
+        condition: service_healthy
     networks:
       - micro-network
     env_file:
@@ -109,13 +137,14 @@ services:
     build:
       context: .
       args:
-        SERVICE_NAME: notes # Проверьте папку в internal, на скрине было 'notes'
+        SERVICE_NAME: notes
     ports:
       - "8083:8083"
     environment:
       DB_URL: postgres://user:password@db-note:5432/note_db?sslmode=disable
     depends_on:
-      - db-note
+      db-note:
+        condition: service_healthy
     networks:
       - micro-network
     env_file:
@@ -131,7 +160,8 @@ services:
     environment:
       DB_URL: postgres://user:password@db-catechize:5432/catechize_db?sslmode=disable
     depends_on:
-      - db-catechize
+      db-catechize:
+        condition: service_healthy
     networks:
       - micro-network
     env_file:

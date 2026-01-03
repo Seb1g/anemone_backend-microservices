@@ -1,7 +1,7 @@
 CREATE TABLE boards (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     title VARCHAR(255) NOT NULL,
-    user_id INT NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    user_id INT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE
 );

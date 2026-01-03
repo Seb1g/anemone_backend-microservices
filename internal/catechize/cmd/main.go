@@ -1,11 +1,11 @@
 package main
 
 import (
-	"anemone_backend-microservices/internal/auth/api"
-	"anemone_backend-microservices/internal/auth/config"
-	"anemone_backend-microservices/internal/auth/database"
-	"anemone_backend-microservices/internal/auth/repository"
-	"anemone_backend-microservices/internal/auth/services"
+	"anemone_backend-microservices/internal/catechize/api"
+	"anemone_backend-microservices/internal/catechize/config"
+	"anemone_backend-microservices/internal/catechize/database"
+	"anemone_backend-microservices/internal/catechize/repository"
+	"anemone_backend-microservices/internal/catechize/services"
 	"context"
 	"embed"
 	"log"
@@ -46,20 +46,13 @@ func main() {
 	defer db.Close()
 	log.Println("INFO: Database connection successful")
 
-	userRepo := repository.NewUserRepo(db)
-	refreshRepo := repository.NewRefreshRepo(db)
-	tokenManager := services.NewJWTTokenManager(
-		cfg.AccessSecret,
-		cfg.RefreshSecret,
-		15*time.Minute,
-		7*24*time.Hour,
-	)
-	authSvc := services.NewAuthService(userRepo, refreshRepo, tokenManager)
-	authHandler := api.NewAuthHandler(authSvc)
+	Repo := repository.NewRepo(db)
+	Svc := services.NewService(Repo)
+	Handler := api.NewHandler(Svc)
 
 	r := mux.NewRouter()
 
-	authHandler.RegisterRoutes(r)
+	Handler.Routes(r, cfg.JWTSecret)
 
 	handlerWithCORS := setupCORS(r)
 

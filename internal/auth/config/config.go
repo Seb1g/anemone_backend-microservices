@@ -28,8 +28,8 @@ func Load() *Config {
 		JWTSecret:     getEnv("JWT_SECRET", "default_secret"),
 		CorsDev:       getEnv("CORS_DEV", ""),
 		CorsProd:      getEnv("CORS_PROD", ""),
-		AccessSecret:  getEnv("ACCESS_SECRET", ""),
-		RefreshSecret: getEnv("REFRESH_SECRET", ""),
+		AccessSecret:  getEnv("ACCESS_SECRET", "123"),
+		RefreshSecret: getEnv("REFRESH_SECRET", "123"),
 	}
 }
 

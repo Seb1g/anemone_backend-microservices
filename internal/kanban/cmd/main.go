@@ -50,7 +50,7 @@ func main() {
 	columnRepo := repository.NewColumnRepo(db)
 	cardRepo := repository.NewCardRepo(db)
 	service := services.NewService(boardRepo, columnRepo, cardRepo)
-	Handler := api.NewHandler(service)
+	Handler := api.NewHandler(service, boardRepo)
 
 	r := mux.NewRouter()
 
