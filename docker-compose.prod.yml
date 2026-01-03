@@ -154,6 +154,24 @@ services:
       - micro-network
     env_file:
       - ./env/catechize.env
+  
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    networks:
+      - micro-network
+    depends_on:
+      - auth-service
+      - kanban-service
+      - mail-service
+      - note-service
+      - catechize-service
 
 networks:
   micro-network:
