@@ -175,6 +175,8 @@ services:
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
     command: tunnel run
+    networks:
+      - micro-network
 
 networks:
   micro-network:
