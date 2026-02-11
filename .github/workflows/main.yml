@@ -16,6 +16,15 @@ jobs:
           echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" > .env
           echo "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}" >> .env
 
+      - name: Create env files
+        run: |
+          mkdir -p env
+          echo "${{ secrets.CATECHIZE_ENV_DATA }}" > env/catechize.env
+          echo "${{ secrets.AUTH_ENV_DATA }}" > env/auth.env
+          echo "${{ secrets.KANBAN_ENV_DATA }}" > env/kanban.env
+          echo "${{ secrets.MAIL_ENV_DATA }}" > env/mail.env
+          echo "${{ secrets.NOTES_ENV_DATA }}" > env/notes.env
+
       - name: Build and Deploy Local
         run: |
           docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
