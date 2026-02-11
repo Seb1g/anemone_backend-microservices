@@ -173,7 +173,7 @@ services:
     image: cloudflare/cloudflared:latest
     restart: always
     environment:
-      - TUNNEL_TOKEN=${{ secrets.CLOUDFLARE_TUNNEL_TOKEN }}
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
     command: tunnel run
 
 networks:
