@@ -8,6 +8,9 @@ jobs:
   deploy-local:
     runs-on: self-hosted
     steps:
+      - name: Fix permissions for cleanup
+        run: sudo chown -R $USER:$USER ${{ github.workspace }} || true
+        
       - name: Checkout code
         uses: actions/checkout@v4
 
