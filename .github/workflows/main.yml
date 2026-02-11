@@ -1,50 +1,29 @@
-name: CI/CD Microservices
+name: CI/CD Microservices (Local Build)
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service: [auth, kanban, mail, notes, catechize]
-    
+  deploy-local:
+    runs-on: self-hosted
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up Environment
+        run: |
+          echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" > .env
+          echo "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}" >> .env
 
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          build-args: |
-            SERVICE_NAME=${{ matrix.service }}
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service }}-service:latest
+      - name: Build and Deploy Local
+        run: |
+          docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+          
+      - name: Cleanup
+        run: |
+          docker image prune -f
 
-  deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /home/project/backend
-            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
       - name: Send Telegram Notification
         uses: appleboy/telegram-action@master
         if: always()
@@ -57,5 +36,3 @@ jobs:
             Status: ${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}
             Commit: ${{ github.event.head_commit.message }}
             Author: ${{ github.actor }}
-            
-            Link: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
