@@ -1,5 +1,5 @@
 services:
-  # --- DATABASES (порты закрыты для внешней среды) ---
+  # --- DATABASES ---
   db-auth:
     image: postgres:15-alpine
     environment:

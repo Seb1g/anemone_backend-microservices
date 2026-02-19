@@ -86,6 +86,10 @@ services:
     image: ${DOCKERHUB_USERNAME}/auth-service:latest
     ports:
       - "8080:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=PathPrefix(`/api/v1/auth`)"
+      - "traefik.http.services.auth.loadbalancer.server.port=8080"
     environment:
       DB_URL: postgres://user:password@db-auth:5432/auth_db?sslmode=disable
     depends_on:
@@ -100,6 +104,10 @@ services:
     image: ${DOCKERHUB_USERNAME}/kanban-service:latest
     ports:
       - "8081:8081"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kanban.rule=PathPrefix(`/api/v1/trello`)"
+      - "traefik.http.services.kanban.loadbalancer.server.port=8081"
     environment:
       DB_URL: postgres://user:password@db-kanban:5432/kanban_db?sslmode=disable
     depends_on:
@@ -115,6 +123,10 @@ services:
     ports:
       - "8082:8082"
       - "25:25"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mail.rule=PathPrefix(`/api/v1/mail`)"
+      - "traefik.http.services.mail.loadbalancer.server.port=8082"
     environment:
       DB_URL: postgres://user:password@db-mail:5432/mail_db?sslmode=disable
     depends_on:
@@ -129,6 +141,10 @@ services:
     image: ${DOCKERHUB_USERNAME}/notes-service:latest
     ports:
       - "8083:8083"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.notes.rule=PathPrefix(`/api/v1/notes`)"
+      - "traefik.http.services.notes.loadbalancer.server.port=8083"
     environment:
       DB_URL: postgres://user:password@db-note:5432/note_db?sslmode=disable
     depends_on:
@@ -143,6 +159,10 @@ services:
     image: ${DOCKERHUB_USERNAME}/catechize-service:latest
     ports:
       - "8084:8084"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.catechize.rule=PathPrefix(`/api/v1/quiz`)"
+      - "traefik.http.services.catechize.loadbalancer.server.port=8084"
     environment:
       DB_URL: postgres://user:password@db-catechize:5432/catechize_db?sslmode=disable
     depends_on:
@@ -153,21 +173,20 @@ services:
     env_file:
       - ./env/catechize.env
   
-  nginx:
-    image: nginx:alpine
+  gateway:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
     ports:
       - "80:80"
-      - "443:443"
+      - "8089:8080"   # Дашборд Traefik (открой http://localhost:8089)
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - micro-network
-    depends_on:
-      - auth-service
-      - kanban-service
-      - mail-service
-      - note-service
-      - catechize-service
   
   cloudflare-tunnel:
     image: cloudflare/cloudflared:latest
