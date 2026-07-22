@@ -1,3 +1,0 @@
-DROP TABLE IF EXISTS temp_addresses;
-
-DROP TABLE IF EXISTS emails;
